@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SolarLeads YYC — Calgary Solar Prospecting Engine</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090f;
+      --bg2: #0c1120;
+      --bg3: #111827;
+      --bg4: #162032;
+      --border: #1e2d47;
+      --border2: #253650;
+      --text: #eef2ff;
+      --text2: #8b9fc4;
+      --text3: #4a5f82;
+      --gold: #f59e0b;
+      --gold2: #ea580c;
+      --green: #10b981;
+      --blue: #3b82f6;
+      --red: #ef4444;
+      --purple: #8b5cf6;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── NAVBAR ── */
+    .nav {
+      height: 58px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      flex-shrink: 0;
+      z-index: 20;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .logo-box {
+      width: 30px; height: 30px;
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+    }
+    .logo span { color: var(--gold); }
+    .nav-stats {
+      display: flex;
+      gap: 36px;
+    }
+    .ns { text-align: center; }
+    .ns-v { font-size: 19px; font-weight: 800; color: var(--gold); line-height: 1; }
+    .ns-l { font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text3); margin-top: 2px; }
+    .nav-badge {
+      font-size: 11px;
+      color: var(--green);
+      background: rgba(16,185,129,0.12);
+      border: 1px solid rgba(16,185,129,0.25);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-weight: 600;
+    }
+
+    /* ── LAYOUT ── */
+    .app {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 272px;
+      flex-shrink: 0;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .sb-sec {
+      padding: 18px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sb-lbl {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text3);
+      margin-bottom: 12px;
+    }
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .pc-input {
+      flex: 1;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .pc-input::placeholder { color: var(--text3); font-weight: 400; letter-spacing: 0; }
+    .pc-input:focus { border-color: var(--gold); }
+    .pc-input.error { border-color: var(--red); animation: shake 0.3s; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+    .btn-add {
+      background: var(--gold);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 0 14px;
+      font-weight: 800;
+      font-size: 18px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-add:hover { opacity: 0.82; }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 28px;
+    }
+    .chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(245,158,11,0.12);
+      border: 1px solid rgba(245,158,11,0.35);
+      border-radius: 20px;
+      padding: 3px 8px 3px 11px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .chip-x {
+      background: none; border: none;
+      color: rgba(245,158,11,0.5);
+      cursor: pointer; font-size: 15px;
+      line-height: 1; padding: 0;
+      transition: color 0.2s;
+    }
+    .chip-x:hover { color: var(--red); }
+    .demo-note {
+      margin-top: 10px;
+      background: rgba(59,130,246,0.08);
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 7px;
+      padding: 8px 10px;
+      font-size: 11px;
+      color: var(--blue);
+      line-height: 1.5;
+    }
+
+    /* preset zones */
+    .presets { display: flex; flex-direction: column; gap: 5px; }
+    .preset {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 11px;
+      cursor: pointer;
+      transition: all 0.18s;
+      text-align: left;
+    }
+    .preset:hover { border-color: var(--border2); background: var(--bg4); }
+    .preset.on { border-color: var(--gold); background: rgba(245,158,11,0.07); }
+    .preset-name { font-size: 12px; font-weight: 700; color: var(--text); }
+    .preset-sub { font-size: 10px; color: var(--text3); margin-top: 1px; }
+    .tier-badge {
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .tier-old     { background: rgba(245,158,11,0.15); color: var(--gold); }
+    .tier-ultra   { background: rgba(245,158,11,0.15); color: var(--gold); }
+    .tier-excl    { background: rgba(139,92,246,0.15); color: var(--purple); }
+    .tier-exec    { background: rgba(16,185,129,0.12); color: var(--green); }
+    .tier-estate  { background: rgba(245,158,11,0.15); color: var(--gold); }
+
+    /* filters */
+    .filter-lbl { font-size: 11px; color: var(--text2); margin-bottom: 5px; }
+    .filter-row { margin-bottom: 10px; }
+    .sel {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      outline: none;
+      cursor: pointer;
+    }
+    .btn-scan {
+      width: 100%;
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      padding: 13px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: -0.2px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-scan:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(245,158,11,0.35);
+    }
+    .btn-scan:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* ── MAIN ── */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 22px;
+      position: relative;
+    }
+
+    /* empty */
+    .empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 12px;
+      color: var(--text3);
+    }
+    .empty-icon { font-size: 56px; opacity: 0.25; }
+    .empty-title { font-size: 18px; font-weight: 700; color: var(--text2); }
+    .empty-sub { font-size: 13px; text-align: center; max-width: 280px; line-height: 1.6; }
+
+    /* scanning */
+    .scanning {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      position: absolute;
+      inset: 0;
+      background: var(--bg);
+      z-index: 10;
+    }
+    .scanning.on { display: flex; }
+    .scan-ring-wrap {
+      width: 160px; height: 160px;
+      position: relative;
+    }
+    .scan-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1.5px solid var(--gold);
+      animation: ripple 2.2s ease-out infinite;
+    }
+    .scan-ring:nth-child(1) { inset: 0;    animation-delay: 0s; }
+    .scan-ring:nth-child(2) { inset: 22px; animation-delay: 0.35s; }
+    .scan-ring:nth-child(3) { inset: 44px; animation-delay: 0.7s; }
+    .scan-core {
+      position: absolute;
+      inset: 55px;
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 0 30px rgba(245,158,11,0.5);
+    }
+    @keyframes ripple {
+      0%   { opacity: 0.9; transform: scale(0.85); }
+      100% { opacity: 0;   transform: scale(1.25); }
+    }
+    .scan-msg { font-size: 16px; font-weight: 700; }
+    .scan-sub { font-size: 12px; color: var(--text3); }
+    .scan-bar-wrap {
+      width: 260px; height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .scan-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--gold2));
+      border-radius: 2px;
+      width: 0;
+      transition: width 0.4s ease;
+    }
+
+    /* results */
+    .res-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .res-title { font-size: 15px; font-weight: 800; }
+    .res-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+    .btn-csv {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 14px;
+      color: var(--text2);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .btn-csv:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 14px;
+    }
+
+    /* card */
+    .card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.18s;
+      animation: fadeUp 0.4s ease both;
+    }
+    .card:hover {
+      border-color: var(--border2);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    }
+    .card.sel {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(245,158,11,0.25);
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* roof viz */
+    .roof {
+      height: 148px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0e1a2c 0%, #0b1620 60%, #101e14 100%);
+    }
+    /* aerial house shape */
+    .house-wrap {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 168px; height: 108px;
+    }
+    .house-roof-shape {
+      width: 100%; height: 100%;
+      background: #253040;
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+    }
+    /* ridge line */
+    .house-roof-shape::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 0; right: 0; height: 1px;
+      background: rgba(255,255,255,0.07);
+    }
+    .panels-grid {
+      position: absolute;
+      inset: 8px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 3px;
+      opacity: 0;
+      transition: opacity 0.45s;
+    }
+    .panels-grid.on { opacity: 1; }
+    .p-cell {
+      background: linear-gradient(135deg, #1a3660 0%, #2563eb 100%);
+      border: 1px solid rgba(59,130,246,0.5);
+      border-radius: 2px;
+    }
+    .p-cell::after {
+      content: '';
+      display: block;
+      height: 100%;
+      background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.06));
+    }
+
+    /* card overlays */
+    .grade-badge {
+      position: absolute;
+      top: 10px; left: 10px;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 900;
+      z-index: 3;
+    }
+    .gA { background: var(--green); color: #000; }
+    .gB { background: var(--gold);  color: #000; }
+    .gC { background: var(--blue);  color: #fff; }
+
+    .view-tog {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: rgba(7,9,15,0.7);
+      backdrop-filter: blur(6px);
+      border-radius: 20px;
+      padding: 3px;
+      display: flex; gap: 2px;
+      z-index: 3;
+    }
+    .vt-btn {
+      background: none; border: none;
+      color: rgba(255,255,255,0.4);
+      font-size: 10px; font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .vt-btn.on {
+      background: var(--gold);
+      color: #000;
+    }
+
+    /* card body */
+    .cbody { padding: 14px; }
+    .c-addr {
+      font-size: 13px; font-weight: 700;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 1px;
+    }
+    .c-hood { font-size: 11px; color: var(--text3); margin-bottom: 11px; }
+    .c-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+    .cm {
+      background: var(--bg2);
+      border-radius: 7px;
+      padding: 7px 9px;
+    }
+    .cm-v { font-size: 14px; font-weight: 700; }
+    .cm-l { font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-top: 1px; }
+    .cm.gold .cm-v { color: var(--gold); }
+    .cm.grn  .cm-v { color: var(--green); }
+    .c-foot { display: flex; align-items: center; justify-content: space-between; }
+    .c-sqft { font-size: 11px; color: var(--text3); }
+    .btn-gen {
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px; font-weight: 800;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .btn-gen:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(245,158,11,0.4);
+    }
+
+    /* ── DETAIL PANEL ── */
+    .detail {
+      width: 0;
+      flex-shrink: 0;
+      background: var(--bg2);
+      border-left: 1px solid var(--border);
+      overflow: hidden;
+      transition: width 0.28s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .detail.open { width: 400px; }
+    .detail-inner {
+      width: 400px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .dh {
+      padding: 18px;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0;
+      background: var(--bg2); z-index: 5;
+    }
+    .dh-addr { font-size: 15px; font-weight: 800; padding-right: 30px; }
+    .dh-hood { font-size: 12px; color: var(--text3); margin-top: 2px; }
+    .dh-close {
+      position: absolute; top: 14px; right: 14px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 6px; width: 26px; height: 26px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text3); font-size: 15px;
+      transition: color 0.2s;
+    }
+    .dh-close:hover { color: var(--text); }
+
+    .ds { padding: 16px 18px; border-bottom: 1px solid var(--border); }
+    .ds-title {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text3); margin-bottom: 12px;
+    }
+
+    /* detail roof */
+    .d-roof {
+      height: 180px;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      background: linear-gradient(135deg, #0e1a2c, #0b1620 60%, #101e14);
+      margin-bottom: 10px;
+    }
+    .d-house-wrap {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 240px; height: 155px;
+    }
+    .d-roof-shape {
+      width: 100%; height: 100%;
+      background: #253040;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+    }
+    .d-panels {
+      position: absolute;
+      inset: 12px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+      opacity: 0;
+      transition: opacity 0.45s;
+    }
+    .d-panels.on { opacity: 1; }
+    .d-cell {
+      background: linear-gradient(135deg, #1a3660, #2563eb);
+      border: 1px solid rgba(59,130,246,0.5);
+      border-radius: 2px;
+    }
+
+    .d-tog {
+      display: flex;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px; gap: 3px;
+    }
+    .d-tog-btn {
+      flex: 1; background: none; border: none;
+      color: var(--text2);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px; font-weight: 700;
+      padding: 7px; border-radius: 6px;
+      cursor: pointer; transition: all 0.18s;
+    }
+    .d-tog-btn.on {
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      color: #000;
+    }
+
+    /* spec grid */
+    .spec-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .spec {
+      background: var(--bg3);
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .spec.wide { grid-column: 1 / -1; }
+    .spec-v { font-size: 17px; font-weight: 800; margin-bottom: 1px; }
+    .spec-l { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); }
+    .spec.grn .spec-v { color: var(--green); }
+    .spec.gld .spec-v { color: var(--gold); }
+    .spec.blu .spec-v { color: var(--blue); }
+    .spec.red .spec-v { color: var(--red); }
+
+    /* roi */
+    .roi-wrap {
+      background: var(--bg3);
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 10px;
+    }
+    .roi-row {
+      display: flex; justify-content: space-between;
+      font-size: 11px; color: var(--text3);
+      margin-bottom: 7px;
+    }
+    .roi-row span:last-child { color: var(--green); font-weight: 700; }
+    .roi-bar {
+      height: 6px; background: var(--border);
+      border-radius: 3px; overflow: hidden; margin-bottom: 8px;
+    }
+    .roi-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), var(--gold));
+      border-radius: 3px;
+    }
+    .roi-note { font-size: 10px; color: var(--text3); line-height: 1.5; }
+
+    /* outreach btns */
+    .out-btns { display: flex; gap: 8px; }
+    .out-btn {
+      flex: 1;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 11px 8px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px; font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 5px;
+    }
+    .out-btn:hover { border-color: var(--gold); background: var(--bg4); }
+    .out-ico { font-size: 20px; }
+
+    /* ── MODAL ── */
+    .backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.82);
+      backdrop-filter: blur(6px);
+      z-index: 100;
+      display: none;
+      align-items: center; justify-content: center;
+    }
+    .backdrop.on { display: flex; }
+    .modal {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: min(90vw, 680px);
+      max-height: 88vh;
+      overflow-y: auto;
+      animation: modalIn 0.22s ease;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.96) translateY(12px); }
+      to   { opacity: 1; transform: none; }
+    }
+    .mh {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; background: var(--bg2);
+    }
+    .mh-title { font-size: 16px; font-weight: 800; }
+    .m-close {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 7px; width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text3); font-size: 16px;
+      transition: color 0.2s;
+    }
+    .m-close:hover { color: var(--text); }
+    .mb { padding: 22px; }
+
+    /* postcard */
+    .postcard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      min-height: 240px;
+    }
+    .pc-l {
+      background: linear-gradient(145deg, #0a1628 0%, #0e1f3a 60%, #0a1c12 100%);
+      padding: 26px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .pc-brand { font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: var(--gold); text-transform: uppercase; }
+    .pc-headline {
+      font-size: 20px; font-weight: 900; line-height: 1.2; color: #fff;
+    }
+    .pc-headline em { color: var(--gold); font-style: normal; }
+    .pc-saving { font-size: 34px; font-weight: 900; color: var(--green); line-height: 1; }
+    .pc-saving-lbl { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 3px; }
+    .pc-cta { font-size: 10px; color: rgba(255,255,255,0.4); }
+    .pc-r {
+      background: #0c1828;
+      padding: 22px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .pc-to-box {
+      background: rgba(245,158,11,0.09);
+      border: 1px solid rgba(245,158,11,0.25);
+      border-radius: 8px;
+      padding: 11px;
+    }
+    .pc-to-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); margin-bottom: 5px; }
+    .pc-to-addr { font-size: 13px; font-weight: 700; line-height: 1.5; }
+    .pc-stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 7px; flex: 1;
+    }
+    .pcs {
+      background: var(--bg3); border-radius: 7px; padding: 9px; text-align: center;
+    }
+    .pcs-v { font-size: 16px; font-weight: 800; }
+    .pcs-l { font-size: 9px; color: var(--text3); margin-top: 2px; }
+
+    /* email / script block */
+    .txt-block {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      font-size: 13px;
+      line-height: 1.75;
+      color: var(--text2);
+      white-space: pre-wrap;
+      font-family: 'Inter', sans-serif;
+    }
+    .m-sub { font-size: 12px; color: var(--text3); margin-bottom: 14px; }
+    .m-actions { display: flex; gap: 10px; margin-top: 14px; }
+    .btn-sec {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 8px; padding: 9px 18px;
+      color: var(--text2);
+      font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.18s;
+    }
+    .btn-sec:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── SATELLITE IMAGERY ── */
+    .sat-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: opacity 0.3s;
+    }
+    .sat-loading {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: #0a1320;
+      font-size: 11px; color: var(--text3);
+      gap: 6px;
+    }
+    .sat-spin {
+      width: 14px; height: 14px;
+      border: 2px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .panel-overlay {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 3px;
+      padding: 18px 28px;
+      opacity: 0;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
+    .panel-overlay.on { opacity: 1; }
+    .panel-overlay .p-cell {
+      background: rgba(37,99,235,0.72);
+      border: 1px solid rgba(147,197,253,0.7);
+      border-radius: 2px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+    .panel-overlay .p-cell::after {
+      content: '';
+      display: block;
+      height: 100%;
+      background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.1));
+    }
+    /* detail panel satellite */
+    .d-sat-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .d-panel-overlay {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 4px;
+      padding: 22px 36px;
+      opacity: 0;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
+    .d-panel-overlay.on { opacity: 1; }
+    .d-panel-overlay .d-cell {
+      background: rgba(37,99,235,0.72);
+      border: 1px solid rgba(147,197,253,0.7);
+      border-radius: 2px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+    /* no-key fallback still works */
+    .no-key .house-wrap { display: block !important; }
+    .no-key .sat-loading { display: none !important; }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="logo">
+    <div class="logo-box">☀️</div>
+    Solar<span>Leads</span>YYC
+  </div>
+  <div class="nav-stats" id="navStats" style="display:none">
+    <div class="ns"><div class="ns-v" id="sHomes">0</div><div class="ns-l">Leads Found</div></div>
+    <div class="ns"><div class="ns-v" id="sAvg">$0</div><div class="ns-l">Avg Home Value</div></div>
+    <div class="ns"><div class="ns-v" id="sPipe">$0</div><div class="ns-l">Solar Pipeline</div></div>
+    <div class="ns"><div class="ns-v" id="sSave">$0</div><div class="ns-l">Avg Monthly Savings</div></div>
+  </div>
+  <div class="nav-badge">● Calgary · 333 sunny days/yr</div>
+</nav>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-sec">
+      <div class="sb-lbl">Postal Codes</div>
+      <div class="input-row">
+        <input id="pcInput" class="pc-input" placeholder="e.g. T2S" maxlength="3">
+        <button class="btn-add" onclick="addPC()">+</button>
+      </div>
+      <div class="chips" id="chips"></div>
+      <div class="demo-note">⚡ Demo mode — data is simulated. Plug in Realtor.ca or CREA API for live MLS listings.</div>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-lbl">Calgary Wealth Zones</div>
+      <div class="presets" id="presets"></div>
+    </div>
+
+    <div class="sb-sec">
+      <div class="sb-lbl">Filters</div>
+      <div class="filter-row">
+        <div class="filter-lbl">Min Home Value</div>
+        <select class="sel" id="fVal">
+          <option value="1200000">$1,200,000+</option>
+          <option value="1500000">$1,500,000+</option>
+          <option value="2000000">$2,000,000+</option>
+          <option value="3000000">$3,000,000+</option>
+        </select>
+      </div>
+      <div class="filter-row">
+        <div class="filter-lbl">Solar Score</div>
+        <select class="sel" id="fScore">
+          <option value="all">All (A · B · C)</option>
+          <option value="A">A-Score only (Best Roofs)</option>
+          <option value="AB">A & B Score</option>
+        </select>
+      </div>
+      <div class="filter-row">
+        <div class="filter-lbl">Sort By</div>
+        <select class="sel" id="fSort">
+          <option value="score">Solar Score</option>
+          <option value="savings">Monthly Savings</option>
+          <option value="value">Home Value</option>
+          <option value="payback">Payback Period</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sb-sec">
+      <button class="btn-scan" id="scanBtn" onclick="doScan()" disabled>
+        🔍 &nbsp;Find Solar Leads
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main" id="main">
+    <div class="empty" id="empty">
+      <div class="empty-icon">☀️</div>
+      <div class="empty-title">Select postal zones to begin</div>
+      <div class="empty-sub">Pick Calgary's wealthiest neighbourhoods on the left, then hit <strong>Find Solar Leads</strong></div>
+    </div>
+
+    <div class="scanning" id="scanning">
+      <div class="scan-ring-wrap">
+        <div class="scan-ring"></div>
+        <div class="scan-ring"></div>
+        <div class="scan-ring"></div>
+        <div class="scan-core">☀️</div>
+      </div>
+      <div class="scan-msg" id="scanMsg">Initializing scan…</div>
+      <div class="scan-sub" id="scanSub">Locating $1.2M+ homes without solar</div>
+      <div class="scan-bar-wrap"><div class="scan-bar" id="scanBar"></div></div>
+    </div>
+
+    <div id="results" style="display:none">
+      <div class="res-hdr">
+        <div>
+          <div class="res-title" id="resTitle">Leads Found</div>
+          <div class="res-sub" id="resSub"></div>
+        </div>
+        <button class="btn-csv" onclick="exportCSV()">⬇ Export CSV</button>
+      </div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </main>
+
+  <!-- DETAIL PANEL -->
+  <div class="detail" id="detail">
+    <div class="detail-inner" id="dInner"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="backdrop" id="backdrop" onclick="bgClose(event)">
+  <div class="modal">
+    <div class="mh">
+      <div class="mh-title" id="mTitle"></div>
+      <button class="m-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="mb" id="mBody"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════
+const ZONES = {
+  T2S: {
+    name: 'Mount Royal / Bel-Aire',
+    hoods: ['Upper Mount Royal', 'Bel-Aire', 'Elbow Park', 'Roxboro'],
+    avg: 3400000, tier: 'Old Money', tierCls: 'tier-old',
+    streets: ['Royal Avenue SW','Prospect Avenue SW','Hillcrest Avenue SW','Robina Avenue SW','Montrose Road SW','Elbow Drive SW']
+  },
+  T2T: {
+    name: 'Elbow Park / Rideau',
+    hoods: ['Rideau Park', 'Elbow Park', 'Altadore'],
+    avg: 2100000, tier: 'Premium', tierCls: 'tier-excl',
+    streets: ['37 Avenue SW','34 Avenue SW','36 Avenue SW','Lathom Avenue SW','Fullerton Road SW']
+  },
+  T2V: {
+    name: 'Eagle Ridge / Britannia',
+    hoods: ['Eagle Ridge', 'Britannia', 'Bayview'],
+    avg: 2900000, tier: 'Ultra-Exclusive', tierCls: 'tier-ultra',
+    streets: ['49 Avenue SW','50 Avenue SW','Lissington Drive SW','Britannia Drive SW','Eagle Ridge Drive SW']
+  },
+  T2W: {
+    name: 'Pump Hill / Palliser',
+    hoods: ['Pump Hill', 'Bayview', 'Palliser'],
+    avg: 1850000, tier: 'Exclusive', tierCls: 'tier-excl',
+    streets: ['Pump Hill Gardens SW','Palliser Drive SW','Bayview Crescent SW','Pump Hill Rise SW','Pump Hill Court SW']
+  },
+  T3H: {
+    name: 'Aspen Woods / West Springs',
+    hoods: ['Aspen Woods', 'Springbank Hill', 'West Springs', 'Signal Hill'],
+    avg: 1650000, tier: 'Executive', tierCls: 'tier-exec',
+    streets: ['Aspen Stone Boulevard SW','Springbank Hill Drive SW','West Springs Drive SW','Signal Hill Drive SW','Aspen Meadows Hill SW']
+  },
+  T3R: {
+    name: 'Rocky Ridge / Royal Oak',
+    hoods: ['Rocky Ridge', 'Royal Oak', 'Tuscany'],
+    avg: 1350000, tier: 'Executive', tierCls: 'tier-exec',
+    streets: ['Rocky Ridge Road NW','Royal Oak Drive NW','Tuscany Boulevard NW','Royal Birch Boulevard NW','Rocky Ridge Bay NW']
+  },
+  T3Z: {
+    name: 'Springbank / Elbow Valley',
+    hoods: ['Springbank', 'Elbow Valley', 'Bearspaw'],
+    avg: 4100000, tier: 'Estate', tierCls: 'tier-estate',
+    streets: ['Springbank Road','Elbow Valley Estates Drive','Bearspaw Village Road','Lochend Road','Valley Crest Rise SW']
+  },
+  T1S: {
+    name: 'Heritage Pointe / Air Ranch',
+    hoods: ['Heritage Pointe', 'Air Ranch', 'De Winton'],
+    avg: 2050000, tier: 'Estate', tierCls: 'tier-estate',
+    streets: ['Heritage Side Road','Heritage Green SW','Air Ranch Drive','Heritage Lake Drive','Heritage Hill SW']
+  }
+};
+
+// ══════════════════════════════════════════
+//  SEEDED RNG
+// ══════════════════════════════════════════
+function mkRng(seed) {
+  let s = seed >>> 0;
+  return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 0x100000000; };
+}
+
+// ══════════════════════════════════════════
+//  PROPERTY GENERATOR
+// ══════════════════════════════════════════
+function solarScore(rng, sqft) {
+  const dirs = ['South','South','South-East','South-West','East','West'];
+  const shades = ['Minimal','Minimal','Low','Medium'];
+  const dir = dirs[Math.floor(rng() * dirs.length)];
+  const shade = shades[Math.floor(rng() * shades.length)];
+  let pts = 0;
+  if (dir === 'South') pts += 40; else if (dir.startsWith('South')) pts += 30; else pts += 14;
+  if (shade === 'Minimal') pts += 38; else if (shade === 'Low') pts += 24; else pts += 10;
+  if (sqft > 5500) pts += 22; else if (sqft > 3800) pts += 14; else pts += 7;
+  const grade = pts >= 82 ? 'A' : pts >= 58 ? 'B' : 'C';
+  return { grade, pts, dir, shade };
+}
+
+function genProps(pc) {
+  const z = ZONES[pc]; if (!z) return [];
+  const seed = pc.split('').reduce((a, c, i) => a + c.charCodeAt(0) * (i + 1) * 31, 0);
+  const rng = mkRng(seed);
+  const n = Math.floor(rng() * 9) + 9;
+  return Array.from({ length: n }, (_, i) => {
+    const street = z.streets[Math.floor(rng() * z.streets.length)];
+    const num = Math.floor(rng() * 8500) + 800;
+    const hood = z.hoods[Math.floor(rng() * z.hoods.length)];
+    const val = Math.round((z.avg * (0.62 + rng() * 0.76)) / 50000) * 50000;
+    const sqft = Math.floor(3600 + rng() * 5200);
+    const usable = Math.floor(sqft * 0.42 * 0.55); // ~23% of floor area
+    const panels = Math.floor(usable / 22);
+    const kw = +(panels * 0.4).toFixed(1);
+    const annProd = kw * 4.87 * 365;         // Calgary peak sun hrs
+    const annSave = +(annProd * 0.172).toFixed(0); // Enmax avg rate
+    const moSave = Math.floor(annSave / 12);
+    const cost = Math.floor(kw * 2800);
+    const payback = +(cost / annSave).toFixed(1);
+    const s25 = Math.floor(annSave * 25 * 1.032);
+    const ss = solarScore(rng, sqft);
+    const moBill = Math.floor(moSave * (1.35 + rng() * 1.25));
+    const yr = Math.floor(1972 + rng() * 48);
+    const ev = rng() > 0.52;
+    return {
+      id: `${pc}-${i}`, addr: `${num} ${street}`, pc, hood,
+      tier: z.tier, val, sqft, panels, kw, moSave, annSave: +annSave,
+      cost, payback, s25, ss, moBill, yr, ev
+    };
+  });
+}
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let selectedPCs = [];
+let leads = [];
+let activeProp = null;
+
+// ══════════════════════════════════════════
+//  POSTAL CODE MANAGEMENT
+// ══════════════════════════════════════════
+function addPC() {
+  const inp = document.getElementById('pcInput');
+  const code = inp.value.toUpperCase().trim().slice(0, 3);
+  inp.value = '';
+  if (!code || !ZONES[code]) {
+    inp.classList.add('error');
+    setTimeout(() => inp.classList.remove('error'), 600);
+    return;
+  }
+  if (!selectedPCs.includes(code)) {
+    selectedPCs.push(code);
+    renderChips(); renderPresets(); toggleScanBtn();
+  }
+}
+
+function removePC(code) {
+  selectedPCs = selectedPCs.filter(c => c !== code);
+  renderChips(); renderPresets(); toggleScanBtn();
+}
+
+function togglePreset(code) {
+  if (selectedPCs.includes(code)) removePC(code);
+  else { selectedPCs.push(code); renderChips(); renderPresets(); toggleScanBtn(); }
+}
+
+function renderChips() {
+  document.getElementById('chips').innerHTML = selectedPCs.map(c => `
+    <div class="chip">${c}<button class="chip-x" onclick="removePC('${c}')">×</button></div>
+  `).join('');
+}
+
+function renderPresets() {
+  document.getElementById('presets').innerHTML = Object.entries(ZONES).map(([code, z]) => `
+    <button class="preset ${selectedPCs.includes(code) ? 'on' : ''}" onclick="togglePreset('${code}')">
+      <div>
+        <div class="preset-name">${z.name}</div>
+        <div class="preset-sub">${code} · ${z.hoods.slice(0,2).join(', ')}</div>
+      </div>
+      <span class="tier-badge ${z.tierCls}">${z.tier}</span>
+    </button>
+  `).join('');
+}
+
+function toggleScanBtn() {
+  document.getElementById('scanBtn').disabled = selectedPCs.length === 0;
+}
+
+// ══════════════════════════════════════════
+//  SCAN
+// ══════════════════════════════════════════
+async function doScan() {
+  document.getElementById('empty').style.display = 'none';
+  document.getElementById('results').style.display = 'none';
+  closeDetail();
+  document.getElementById('scanning').classList.add('on');
+  document.getElementById('scanBtn').disabled = true;
+
+  const steps = [
+    ['Querying property registry…',    'Accessing Alberta Land Titles data'],
+    ['Filtering by home value…',       `Homes $${fmtVal(parseInt(document.getElementById('fVal').value))}+ only`],
+    ['Analyzing rooftop geometry…',    'Measuring roof area & orientation per parcel'],
+    ['Calculating solar potential…',   'Calgary peak sun: 4.87 hrs/day · Enmax $0.172/kWh'],
+    ['Scoring leads…',                 'Ranking by solar grade, savings & home value'],
+    ['Preparing lead cards…',          'Generating outreach materials'],
+  ];
+
+  for (let i = 0; i < steps.length; i++) {
+    document.getElementById('scanMsg').textContent = steps[i][0];
+    document.getElementById('scanSub').textContent = steps[i][1];
+    document.getElementById('scanBar').style.width = `${((i + 1) / steps.length) * 100}%`;
+    await delay(520);
+  }
+
+  // generate
+  const minVal = parseInt(document.getElementById('fVal').value);
+  const scoreF = document.getElementById('fScore').value;
+  const sortF  = document.getElementById('fSort').value;
+
+  let all = selectedPCs.flatMap(pc => genProps(pc)).filter(p => p.val >= minVal);
+  if (scoreF === 'A')  all = all.filter(p => p.ss.grade === 'A');
+  if (scoreF === 'AB') all = all.filter(p => ['A','B'].includes(p.ss.grade));
+
+  if (sortF === 'savings') all.sort((a, b) => b.moSave - a.moSave);
+  else if (sortF === 'value') all.sort((a, b) => b.val - a.val);
+  else if (sortF === 'payback') all.sort((a, b) => a.payback - b.payback);
+  else all.sort((a, b) => {
+    const g = { A: 3, B: 2, C: 1 };
+    return (g[b.ss.grade] - g[a.ss.grade]) || (b.ss.pts - a.ss.pts);
+  });
+
+  leads = all;
+
+  // Geocode addresses if Mapbox token is set
+  const token = getApiKey();
+  if (token) {
+    document.getElementById('scanMsg').textContent = 'Fetching satellite imagery…';
+    document.getElementById('scanSub').textContent = `Geocoding ${leads.length} addresses via Mapbox`;
+    document.getElementById('scanBar').style.width = '95%';
+    // Geocode in batches of 5 with small delay to respect rate limits
+    const batchSize = 5;
+    for (let i = 0; i < leads.length; i += batchSize) {
+      const batch = leads.slice(i, i + batchSize);
+      await Promise.all(batch.map(async p => {
+        const coords = await geocode(p.addr, token);
+        p.coords = coords; // [lng, lat] or null
+      }));
+      if (i + batchSize < leads.length) await delay(120);
+    }
+  }
+
+  document.getElementById('scanBar').style.width = '100%';
+  await delay(150);
+  document.getElementById('scanning').classList.remove('on');
+  renderResults();
+  document.getElementById('scanBtn').disabled = false;
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ══════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════
+function renderResults() {
+  const n = leads.length;
+  const avgVal = leads.reduce((s, p) => s + p.val, 0) / n;
+  const pipe   = leads.reduce((s, p) => s + p.cost, 0);
+  const avgSave = leads.reduce((s, p) => s + p.moSave, 0) / n;
+  const aCount  = leads.filter(p => p.ss.grade === 'A').length;
+
+  document.getElementById('navStats').style.display = 'flex';
+  document.getElementById('sHomes').textContent = n;
+  document.getElementById('sAvg').textContent   = '$' + fmtM(avgVal);
+  document.getElementById('sPipe').textContent  = '$' + fmtM(pipe);
+  document.getElementById('sSave').textContent  = '$' + Math.round(avgSave).toLocaleString();
+
+  document.getElementById('resTitle').textContent = `${n} Solar Leads Found`;
+  document.getElementById('resSub').textContent =
+    `${selectedPCs.length} postal zone${selectedPCs.length > 1 ? 's' : ''} · ${aCount} A-grade roofs · avg payback ${(leads.reduce((s,p)=>s+parseFloat(p.payback),0)/n).toFixed(1)} yrs`;
+
+  document.getElementById('grid').innerHTML = leads.map((p, i) => cardHTML(p, i)).join('');
+  document.getElementById('results').style.display = 'block';
+}
+
+function cardHTML(p, i) {
+  const key = getApiKey();
+  const hasSat = key && p.coords;
+  const satUrl = hasSat ? mapsUrl(p.coords[0], p.coords[1], 300, 150, 19, key) : '';
+  const roofHtml = hasSat
+    ? `<div class="sat-loading" id="sl-${p.id}"><div class="sat-spin"></div>Loading satellite…</div>
+       <img class="sat-img" src="${satUrl}" alt="Satellite" style="opacity:0"
+         onload="this.style.opacity=1;document.getElementById('sl-${p.id}').style.display='none'"
+         onerror="this.closest('.roof').classList.add('no-key');document.getElementById('sl-${p.id}').innerHTML='📍 Imagery unavailable'">
+       <div class="panel-overlay" id="pg-${p.id}">${panelCells(4,5)}</div>`
+    : `<div class="house-wrap"><div class="house-roof-shape"><div class="panels-grid" id="pg-${p.id}">${panelCells(4,5)}</div></div></div>`;
+
+  return `
+  <div class="card" id="c-${p.id}" style="animation-delay:${Math.min(i*70,700)}ms" onclick="openDetail('${p.id}')">
+    <div class="roof">
+      ${roofHtml}
+      <div class="grade-badge g${p.ss.grade}">${p.ss.grade}</div>
+      <div class="view-tog">
+        <button class="vt-btn on" id="vb-${p.id}" onclick="event.stopPropagation();cToggle('${p.id}','before',${!!key})">Before</button>
+        <button class="vt-btn"    id="va-${p.id}" onclick="event.stopPropagation();cToggle('${p.id}','after',${!!key})">After ☀️</button>
+      </div>
+    </div>
+    <div class="cbody">
+      <div class="c-addr">${p.addr}</div>
+      <div class="c-hood">${p.hood} · ${p.pc}</div>
+      <div class="c-metrics">
+        <div class="cm gold"><div class="cm-v">${fmtDollarM(p.val)}</div><div class="cm-l">Home Value</div></div>
+        <div class="cm grn"><div class="cm-v">$${p.moSave.toLocaleString()}/mo</div><div class="cm-l">Solar Savings</div></div>
+        <div class="cm"><div class="cm-v">${p.kw} kW</div><div class="cm-l">System Size</div></div>
+        <div class="cm"><div class="cm-v">${p.payback} yrs</div><div class="cm-l">Payback</div></div>
+      </div>
+      <div class="c-foot">
+        <div class="c-sqft">🏠 ${p.sqft.toLocaleString()} sqft · ${p.ss.dir}</div>
+        <button class="btn-gen" onclick="event.stopPropagation();openPostcard('${p.id}')">Generate Lead ✉</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function panelCells(rows, cols) {
+  return Array.from({ length: rows * cols }, () => '<div class="p-cell"></div>').join('');
+}
+
+function cToggle(id, mode, hasSat) {
+  // with satellite: overlay div uses .panel-overlay; without: .panels-grid inside .house-roof-shape
+  const overlay = document.getElementById(`pg-${id}`);
+  if (overlay) overlay.classList.toggle('on', mode === 'after');
+  document.getElementById(`vb-${id}`).classList.toggle('on', mode === 'before');
+  document.getElementById(`va-${id}`).classList.toggle('on', mode === 'after');
+}
+
+// ══════════════════════════════════════════
+//  DETAIL PANEL
+// ══════════════════════════════════════════
+function openDetail(id) {
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('sel'));
+  document.getElementById(`c-${id}`)?.classList.add('sel');
+  const p = leads.find(x => x.id === id);
+  if (!p) return;
+  activeProp = p;
+  document.getElementById('detail').classList.add('open');
+  document.getElementById('dInner').innerHTML = detailHTML(p);
+}
+
+function detailHTML(p) {
+  const roi = Math.min(((p.annSave / p.cost) * 100), 22).toFixed(1);
+  const barW = Math.min(parseFloat(roi) * 4.5, 100);
+  return `
+  <div class="dh" style="position:relative">
+    <button class="dh-close" onclick="closeDetail()">✕</button>
+    <div class="dh-addr">${p.addr}</div>
+    <div class="dh-hood">${p.hood} · ${p.pc} · <span style="color:var(--gold)">${p.tier}</span></div>
+  </div>
+
+  <div class="ds">
+    <div class="ds-title">Rooftop Visualizer</div>
+    <div class="d-roof" id="droof">
+      ${(()=>{
+        const key = getApiKey();
+        const hasSat = key && p.coords;
+        if (hasSat) {
+          const url = mapsUrl(p.coords[0], p.coords[1], 364, 180, 19, key);
+          return `<div class="sat-loading" id="dsl"><div class="sat-spin"></div>Loading satellite…</div>
+                  <img class="d-sat-img" src="${url}" alt="Satellite" style="opacity:0"
+                    onload="this.style.opacity=1;document.getElementById('dsl').style.display='none'"
+                    onerror="document.getElementById('dsl').innerHTML='📍 Satellite imagery unavailable for this address'">
+                  <div class="d-panel-overlay" id="dp">${dPanels(p.panels)}</div>`;
+        } else {
+          return `<div class="d-house-wrap"><div class="d-roof-shape"><div class="d-panels" id="dp">${dPanels(p.panels)}</div></div></div>`;
+        }
+      })()}
+    </div>
+    <div class="d-tog">
+      <button class="d-tog-btn on" id="dtB" onclick="dToggle('before')">🏠 Before — No Solar</button>
+      <button class="d-tog-btn"    id="dtA" onclick="dToggle('after')">☀️ After — ${p.panels} Panels</button>
+    </div>
+  </div>
+
+  <div class="ds">
+    <div class="ds-title">System Design</div>
+    <div class="spec-grid">
+      <div class="spec gld"><div class="spec-v">${p.kw} kW</div><div class="spec-l">System Size</div></div>
+      <div class="spec"><div class="spec-v">${p.panels}</div><div class="spec-l">400W Panels</div></div>
+      <div class="spec grn"><div class="spec-v">$${p.moSave.toLocaleString()}</div><div class="spec-l">Monthly Savings</div></div>
+      <div class="spec grn"><div class="spec-v">$${p.annSave.toLocaleString()}</div><div class="spec-l">Annual Savings</div></div>
+      <div class="spec"><div class="spec-v">$${p.cost.toLocaleString()}</div><div class="spec-l">System Cost</div></div>
+      <div class="spec"><div class="spec-v">${p.payback} yrs</div><div class="spec-l">Payback Period</div></div>
+      <div class="spec grn wide"><div class="spec-v">$${p.s25.toLocaleString()}</div><div class="spec-l">25-Year Net Savings (3% annual rate increase)</div></div>
+    </div>
+    <div class="roi-wrap">
+      <div class="roi-row"><span>Annual ROI</span><span>${roi}%</span></div>
+      <div class="roi-bar"><div class="roi-fill" style="width:${barW}%"></div></div>
+      <div class="roi-note">Enmax avg $0.172/kWh · Calgary 4.87 peak sun hrs/day · ${p.panels} × 400W panels · 25-yr panel warranty</div>
+    </div>
+  </div>
+
+  <div class="ds">
+    <div class="ds-title">Property Profile</div>
+    <div class="spec-grid">
+      <div class="spec gld"><div class="spec-v">${fmtDollarM(p.val)}</div><div class="spec-l">Est. Value</div></div>
+      <div class="spec"><div class="spec-v">${p.sqft.toLocaleString()} ft²</div><div class="spec-l">Home Size</div></div>
+      <div class="spec"><div class="spec-v">${p.yr}</div><div class="spec-l">Year Built</div></div>
+      <div class="spec"><div class="spec-v">${p.ss.dir}</div><div class="spec-l">Roof Facing</div></div>
+      <div class="spec"><div class="spec-v" style="color:${p.ss.grade==='A'?'var(--green)':p.ss.grade==='B'?'var(--gold)':'var(--blue)'};font-size:26px">${p.ss.grade}</div><div class="spec-l">Solar Score</div></div>
+      <div class="spec red"><div class="spec-v">$${p.moBill.toLocaleString()}/mo</div><div class="spec-l">Est. Hydro Bill</div></div>
+    </div>
+  </div>
+
+  <div class="ds">
+    <div class="ds-title">Generate Outreach</div>
+    <div class="out-btns">
+      <button class="out-btn" onclick="openPostcard('${p.id}')"><div class="out-ico">📮</div>Postcard</button>
+      <button class="out-btn" onclick="openEmail('${p.id}')"><div class="out-ico">✉️</div>Email</button>
+      <button class="out-btn" onclick="openScript('${p.id}')"><div class="out-ico">📞</div>Call Script</button>
+    </div>
+  </div>`;
+}
+
+function dPanels(n) {
+  const rows = 5, cols = 6, max = rows * cols;
+  const fill = Math.min(n, max);
+  return Array.from({ length: max }, (_, i) =>
+    i < fill ? '<div class="d-cell"></div>' : '<div></div>'
+  ).join('');
+}
+
+function closeDetail() {
+  document.getElementById('detail').classList.remove('open');
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('sel'));
+  activeProp = null;
+}
+
+// ══════════════════════════════════════════
+//  MODALS
+// ══════════════════════════════════════════
+function openPostcard(id) {
+  const p = leads.find(x => x.id === id); if (!p) return;
+  document.getElementById('mTitle').textContent = '📮 Direct Mail Postcard';
+  document.getElementById('mBody').innerHTML = `
+    <p class="m-sub">Print-ready postcard for ${p.addr}. Mail directly to homeowner.</p>
+    <div class="postcard">
+      <div class="pc-l">
+        <div class="pc-brand">☀ SolarLeads YYC</div>
+        <div>
+          <div class="pc-headline">Your neighbours<br>are cutting their<br>bill by <em>up to 90%</em></div>
+        </div>
+        <div>
+          <div class="pc-saving">$${p.moSave.toLocaleString()}/mo</div>
+          <div class="pc-saving-lbl">Your estimated monthly savings</div>
+        </div>
+        <div class="pc-cta">Free roof design · No obligation · Calgary's solar specialists</div>
+      </div>
+      <div class="pc-r">
+        <div class="pc-to-box">
+          <div class="pc-to-lbl">Delivered To</div>
+          <div class="pc-to-addr">${p.addr}<br>${p.hood}, Calgary AB ${p.pc}</div>
+        </div>
+        <div class="pc-stats">
+          <div class="pcs"><div class="pcs-v" style="color:var(--gold)">${p.kw} kW</div><div class="pcs-l">Ideal System</div></div>
+          <div class="pcs"><div class="pcs-v" style="color:var(--green)">$${p.annSave.toLocaleString()}</div><div class="pcs-l">Year 1 Savings</div></div>
+          <div class="pcs"><div class="pcs-v" style="color:var(--blue)">${p.payback} yrs</div><div class="pcs-l">Payback Period</div></div>
+          <div class="pcs"><div class="pcs-v" style="color:var(--green)">$${fmtM(p.s25)}</div><div class="pcs-l">25-Yr Savings</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="m-actions">
+      <button class="btn-sec" onclick="window.print()">🖨️ Print</button>
+      <button class="btn-sec" onclick="cp('${p.addr}, ${p.hood}, Calgary, AB ${p.pc}')">📋 Copy Address</button>
+    </div>`;
+  openModal();
+}
+
+function openEmail(id) {
+  const p = leads.find(x => x.id === id); if (!p) return;
+  const txt = `Subject: Quick question about your home at ${p.addr}
+
+Hi there,
+
+I'm reaching out because I came across your property at ${p.addr} and ran a quick rooftop solar analysis for the ${p.hood} area.
+
+Your home scored ${p.ss.grade} — one of the stronger scores I've seen in the ${p.pc} zone — primarily because of your ${p.ss.dir.toLowerCase()}-facing roof and the size of your property.
+
+Here's what the numbers look like specifically for your home:
+
+  • Recommended system: ${p.kw} kW (${p.panels} panels)
+  • Monthly savings: $${p.moSave.toLocaleString()}/month
+  • Annual savings: $${p.annSave.toLocaleString()}
+  • 25-year return: $${p.s25.toLocaleString()}
+  • Payback period: ~${p.payback} years
+
+With Calgary averaging 333 sunny days a year and Enmax rates having climbed 23% in 3 years, solar on a home like yours acts more like a capital asset than an expense — it pays you back, then keeps paying.
+
+We do the full system design for free. No obligation, no pushy follow-ups.
+
+Worth 15 minutes to walk through the numbers?
+
+Best,
+[Your Name]
+[Your Company] | Calgary Solar Specialists
+[Phone] | [Email]
+
+P.S. Locking in solar now insulates you from future utility rate hikes — that's a conversation worth having before the next rate increase.`;
+
+  document.getElementById('mTitle').textContent = '✉️ Email Template';
+  document.getElementById('mBody').innerHTML = `
+    <p class="m-sub">Personalized cold email for ${p.addr}. Edit before sending.</p>
+    <div class="txt-block" id="emailTxt">${txt}</div>
+    <div class="m-actions"><button class="btn-sec" onclick="cpEl('emailTxt')">📋 Copy Email</button></div>`;
+  openModal();
+}
+
+function openScript(id) {
+  const p = leads.find(x => x.id === id); if (!p) return;
+  const txt = `CALL SCRIPT — ${p.addr}
+Solar Score: ${p.ss.grade}  |  Est. Savings: $${p.moSave}/mo  |  Est. Current Bill: $${p.moBill}/mo
+
+━━━ OPENER (first 8 seconds) ━━━
+"Hi, I'm [Name] from [Company]. I just finished a rooftop analysis for homes in ${p.hood} and yours came back with one of the best solar scores in the area. I wanted to share the numbers — is now a terrible time?"
+
+━━━ IF THEY BITE ━━━
+"Based on your roof size and orientation, we'd be looking at a ${p.kw} kW system — about ${p.panels} panels. In Calgary that produces roughly $${p.moSave.toLocaleString()} off your monthly bill.
+
+Over 25 years, that's $${p.s25.toLocaleString()} in savings. Payback period is around ${p.payback} years — after that it's pure return.
+
+We design the system for free. No obligation, no pressure."
+
+━━━ OBJECTION: "Not interested" ━━━
+"Completely fair. Can I ask — is it the cost, or just not the right time? We offer $0-down financing where the monthly savings actually cover the payment from day one."
+
+━━━ OBJECTION: "Too expensive" ━━━
+"I hear that. But here's the thing — at $${p.moBill.toLocaleString()} a month in electricity, you're already paying for solar. You're just sending that money to Enmax instead of building equity in your home."
+
+━━━ OBJECTION: "We're selling soon" ━━━
+"Solar adds direct value — buyers in ${p.hood} love a $0 utility bill. Studies show solar adds ~4% to resale value. On a home like yours that's $${Math.round(p.val * 0.04 / 1000) * 1000 >= 1000000 ? fmtDollarM(Math.round(p.val * 0.04 / 1000) * 1000) : '$' + (Math.round(p.val * 0.04 / 1000) * 1000).toLocaleString()}."
+
+━━━ CLOSE ━━━
+"Can we book 20 minutes next week? I'll bring the actual roof design and show you exactly what your system looks like. What day works — Monday or Tuesday?"`;
+
+  document.getElementById('mTitle').textContent = '📞 Call Script';
+  document.getElementById('mBody').innerHTML = `
+    <p class="m-sub">Phone script for ${p.addr}. Est. hydro bill: $${p.moBill}/mo</p>
+    <div class="txt-block" id="scriptTxt">${txt}</div>
+    <div class="m-actions"><button class="btn-sec" onclick="cpEl('scriptTxt')">📋 Copy Script</button></div>`;
+  openModal();
+}
+
+function openModal() { document.getElementById('backdrop').classList.add('on'); }
+function closeModal() { document.getElementById('backdrop').classList.remove('on'); }
+function bgClose(e)   { if (e.target === document.getElementById('backdrop')) closeModal(); }
+
+// ══════════════════════════════════════════
+//  EXPORT
+// ══════════════════════════════════════════
+function exportCSV() {
+  const hdr = ['Address','Postal Code','Neighbourhood','Tier','Est Value','Sqft','Solar Score','System kW',
+    'Panels','Monthly Savings','Annual Savings','System Cost','Payback Yrs','25yr Savings',
+    'Roof Facing','Shade','Year Built','Est Monthly Bill','Has EV'];
+  const rows = leads.map(p => [
+    p.addr, p.pc, p.hood, p.tier, p.val, p.sqft, p.ss.grade, p.kw,
+    p.panels, p.moSave, p.annSave, p.cost, p.payback, p.s25,
+    p.ss.dir, p.ss.shade, p.yr, p.moBill, p.ev ? 'Yes' : 'No'
+  ]);
+  const csv = [hdr, ...rows].map(r => r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = `solar-leads-yyc-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// ══════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════
+function fmtM(v) {
+  if (v >= 1e6) return (v/1e6).toFixed(1) + 'M';
+  if (v >= 1e3) return Math.round(v/1000) + 'K';
+  return v.toLocaleString();
+}
+function fmtDollarM(v) { return '$' + fmtM(v); }
+function fmtVal(v) {
+  if (v >= 1e6) return (v/1e6).toFixed(1) + 'M';
+  return (v/1e3).toFixed(0) + 'K';
+}
+function cp(text) { navigator.clipboard.writeText(text).then(() => alert('Copied!')); }
+function cpEl(id) { cp(document.getElementById(id).textContent); }
+
+// ══════════════════════════════════════════
+//  MAPBOX API
+// ══════════════════════════════════════════
+const MAPBOX_TOKEN = 'YOUR_MAPBOX_TOKEN_HERE';
+
+function getApiKey() {
+  return MAPBOX_TOKEN;
+}
+
+// Geocode a single address via Mapbox Geocoding API, returns [lng, lat] or null
+async function geocode(address, token) {
+  const query = encodeURIComponent(address + ', Calgary, Alberta, Canada');
+  try {
+    const res = await fetch(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json?country=CA&types=address&limit=1&access_token=${token}`
+    );
+    const data = await res.json();
+    if (data.features && data.features.length > 0) {
+      return data.features[0].center; // [lng, lat]
+    }
+  } catch(e) {}
+  return null;
+}
+
+// Build Mapbox Static Image URL from coordinates
+function mapsUrl(lng, lat, w, h, zoom, token) {
+  return `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${lng},${lat},${zoom},0/${w}x${h}@2x?access_token=${token}`;
+}
+
+function dToggle(mode) {
+  const dp = document.getElementById('dp');
+  if (!dp) return;
+  // works for both .d-panels (diagram) and .d-panel-overlay (satellite)
+  dp.classList.toggle('on', mode === 'after');
+  document.getElementById('dtB')?.classList.toggle('on', mode === 'before');
+  document.getElementById('dtA')?.classList.toggle('on', mode === 'after');
+}
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+document.getElementById('pcInput').addEventListener('keydown', e => { if (e.key === 'Enter') addPC(); });
+
+
+renderPresets();
+</script>
+</body>
+</html>
